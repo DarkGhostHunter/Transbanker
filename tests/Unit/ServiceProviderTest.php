@@ -8,13 +8,13 @@ use DarkGhostHunter\TransbankApi\Webpay;
 use Illuminate\Contracts\Http\Kernel;
 use Orchestra\Testbench\TestCase;
 
-class TransbankerServiceProviderTest extends TestCase
+class ServiceProviderTest extends TestCase
 {
 
     protected function getPackageProviders($app)
     {
         return [
-            'DarkGhostHunter\Transbanker\TransbankerServiceProvider'
+            'DarkGhostHunter\Transbanker\ServiceProvider'
         ];
     }
 
@@ -29,7 +29,7 @@ class TransbankerServiceProviderTest extends TestCase
     public function testPublishesConfigFile()
     {
         $this->artisan('vendor:publish', [
-            '--provider' => 'DarkGhostHunter\Transbanker\TransbankerServiceProvider'
+            '--provider' => 'DarkGhostHunter\Transbanker\ServiceProvider'
         ]);
 
         $this->assertFileExists(config_path('transbanker.php'));
