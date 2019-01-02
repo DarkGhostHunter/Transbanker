@@ -85,6 +85,8 @@ class TransbankerServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../config/transbanker.php' => config_path('transbanker.php'),
         ]);
+
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'transbanker');
     }
 
 }

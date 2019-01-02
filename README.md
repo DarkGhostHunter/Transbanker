@@ -55,6 +55,44 @@ ONEPAY_SECRET="?XW#WOLG##FBAGEAYSNQ5APD#JF@$AYZ"
 
 That is the basic configuration. If you need to fine tune this package, refer to the Advanced section.
 
+## Redirection
+
+This package registers the `transbank::webpay-redirect` for instant redirection to Webpay. When creating a Webpay Plus or Webpay Oneclick transaction, you can redirect the user instantly to the payment gateway in your controllers:
+
+```php
+<?
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use DarkGhostHunter\Transbanker\Facades\Webpay;
+
+class PaymentController extends Controller {
+    
+    /**
+     * Creates a Payment
+     * 
+     * @param Request $request
+     * @return \Illuminate\View\View
+     */
+    public function pay(Request $request)
+    {
+        // .. Validate Request, amount, etc..
+        
+        $response = Webpay::createNormal([
+            'sessionId' => $request->session()->getId(),
+            'buyOrder'  => 'myOrder#16548',
+            'amount'    => 1000,
+        ]);
+        
+        return view('transbanker::webpay-redirect', [
+            'response' => $response            
+        ]);
+    }
+    
+}
+```  
+
 ## Usage
 
 For usage, check the [TransbankApi](https://github.com/DarkGhostHunter/transbank-api/wiki/) (Spanish, [English by Google Translate](https://translate.google.com/translate?hl=en&sl=es&tl=en&u=https%3A%2F%2Fgithub.com%2FDarkGhostHunter%2Ftransbank-api%2Fwiki%2F)). 
@@ -82,7 +120,7 @@ This package with some default routes for your application (as configured inside
 | Webpay Oneclick | Response URL | `http://yourappurl.com/webpay/registration` |
 | Onepay | Callback URL  | `http://yourappurl.com/onepay/result` |
 
-You're free to change these URL.
+You're free to change these URLs.
 
 In any case, be sure to add your logic in these routes to receive Transbank HTTP POST Requests.
 

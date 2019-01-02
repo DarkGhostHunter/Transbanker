@@ -134,4 +134,11 @@ class TransbankerServiceProviderTest extends TestCase
 
         $this->assertEquals($transbank->getLogger(), $logger);
     }
+
+    public function testRegisterViews()
+    {
+        $view = $this->app->make('view');
+
+        $this->assertTrue($view->exists('transbanker::webpay-redirect'));
+    }
 }
