@@ -1,0 +1,48 @@
+{
+    "name": "darkghosthunter/transvel",
+    "description": "Transbank connector for Laravel",
+    "keywords": [
+        "transbank",
+        "webpay",
+        "onepay",
+        "patpass",
+        "laravel"
+    ],
+    "license": "MIT",
+    "version": "1.0",
+    "require": {
+        "php": "^7.1.3",
+        "illuminate/http": "5.7.*",
+        "illuminate/events": "5.7.*",
+        "illuminate/config": "5.7.*",
+        "illuminate/support": "5.7.*",
+        "illuminate/view": "5.7.*",
+        "darkghosthunter/transbank-api": "^2.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.0",
+        "orchestra/testbench": "3.7.*"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "DarkGhostHunter\\Transbanker\\ServiceProvider"
+            ],
+            "aliases": {
+                "Transbank": "DarkGhostHunter\\Transbanker\\Facades\\Transbank",
+                "Webpay": "DarkGhostHunter\\Transbanker\\Facades\\Webpay",
+                "Onepay": "DarkGhostHunter\\Transbanker\\Facades\\Onepay"
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "DarkGhostHunter\\Transbanker\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    }
+}
