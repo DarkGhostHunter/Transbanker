@@ -12,7 +12,7 @@ class ViewTest extends TestCase
     protected function getPackageProviders($app)
     {
         return [
-            'DarkGhostHunter\Transbanker\TransbankerServiceProvider'
+            'DarkGhostHunter\Transbanker\ServiceProvider'
         ];
     }
 

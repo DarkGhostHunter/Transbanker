@@ -2,12 +2,12 @@
 
 namespace DarkGhostHunter\Transbanker;
 
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use DarkGhostHunter\TransbankApi\Onepay;
 use DarkGhostHunter\TransbankApi\Webpay;
 use DarkGhostHunter\TransbankApi\Transbank;
 
-class TransbankerServiceProvider extends ServiceProvider
+class ServiceProvider extends BaseServiceProvider
 {
     /**
      * Register bindings in the container.

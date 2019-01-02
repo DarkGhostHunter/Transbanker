@@ -122,7 +122,7 @@ This package with some default routes for your application (as configured inside
 
 You're free to change these URLs.
 
-In any case, be sure to add your logic in these routes to receive Transbank HTTP POST Requests.
+In any case, be sure to add your logic in these routes to receive Transbank http POST Requests, and **remove the `csrf` middleware** since Webpay will need to hit these routes so the payment can be processed.
 
 ## License
 
