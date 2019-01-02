@@ -3,17 +3,12 @@ branches:
     - master
     - stable
 
-sudo: required
-dist: trusty
-
 language: php
+
 php:
   - 7.1
   - 7.2
   - 7.3
-
-addons:
-  chrome: stable
 
 env:
   global:
