@@ -2,10 +2,12 @@
 
 namespace DarkGhostHunter\Transbanker;
 
-use Illuminate\Support\ServiceProvider as BaseServiceProvider;
+use Illuminate\Support\ServiceProvider;
+use DarkGhostHunter\TransbankApi\Onepay;
+use DarkGhostHunter\TransbankApi\Webpay;
 use DarkGhostHunter\TransbankApi\Transbank;
 
-class TransbankServiceProvider extends BaseServiceProvider
+class TransbankerServiceProvider extends ServiceProvider
 {
     /**
      * Register bindings in the container.
@@ -15,19 +17,21 @@ class TransbankServiceProvider extends BaseServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(
-            __DIR__.'/../config/transbank.php', 'transbank'
+            __DIR__ . '/../config/transbanker.php', 'transbank'
         );
 
         // Register the Transbank Configuration
         $this->app->singleton(Transbank::class, function ($app) {
-            $transbank = new Transbank($app->make('logger'));
+            $transbank = new Transbank($app->make('log'));
 
             $transbank->setEnvironment(
                 $app->make('config')->get('transbank.environment')
             );
 
-            $transbank->setCredentials('webpay', $this->mergeWebpayCredentials());
-            $transbank->setCredentials('onepay', config('transbank.credentials.onepay'));
+            if ($transbank->isProduction()) {
+                $transbank->setCredentials('webpay', $this->mergeWebpayCredentials());
+                $transbank->setCredentials('onepay', config('transbank.credentials.onepay'));
+            }
 
             return $transbank;
         });
@@ -52,6 +56,8 @@ class TransbankServiceProvider extends BaseServiceProvider
     {
         $array = config('transbank.credentials.webpay');
 
+        $array = array_filter($array);
+
         return array_merge($array, [
             'privateKey' => $this->getWebpayCredential(array_get($array, 'privateKey')),
             'publicCert' => $this->getWebpayCredential(array_get($array, 'publicCert')),
@@ -64,9 +70,9 @@ class TransbankServiceProvider extends BaseServiceProvider
      * @param string $file
      * @return bool|string
      */
-    protected function getWebpayCredential(string $file)
+    protected function getWebpayCredential(string $file = null)
     {
-        return $this->app('file')->get(storage_path('transbank/webpay/' . $file));
+        return file_get_contents(storage_path('transbank/webpay/' . $file));
     }
 
     /**
@@ -77,7 +83,7 @@ class TransbankServiceProvider extends BaseServiceProvider
     public function boot()
     {
         $this->publishes([
-            __DIR__.'/../config/transbank.php' => config_path('transbank.php'),
+            __DIR__ . '/../config/transbanker.php' => config_path('transbanker.php'),
         ]);
     }
 

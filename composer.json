@@ -1,6 +1,6 @@
 {
     "name": "darkghosthunter/transvel",
-    "description": "Transbank connector for Laravel",
+    "description": "Transbank API connector for Laravel",
     "keywords": [
         "transbank",
         "webpay",
@@ -9,7 +9,6 @@
         "laravel"
     ],
     "license": "MIT",
-    "version": "1.0",
     "require": {
         "php": "^7.1.3",
         "illuminate/http": "5.7.*",

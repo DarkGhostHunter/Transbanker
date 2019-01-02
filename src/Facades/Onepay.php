@@ -1,6 +1,6 @@
 <?php
 
-namespace DarkGhostHunter\Transbanker;
+namespace DarkGhostHunter\Transbanker\Facades;
 
 use Illuminate\Support\Facades\Facade;
 use DarkGhostHunter\TransbankApi\Onepay as OnepayAccessor;

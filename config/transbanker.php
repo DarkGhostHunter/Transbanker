@@ -31,13 +31,13 @@ return [
     'credentials' => [
         'webpay' => [
             'commerceCode' => env('WEBPAY_COMMERCE_CODE'),
-            'privateKey' => env('WEBPAY_PRIVATE_KEY'),
-            'publicCert' => env('WEBPAY_PUBLIC_CERT'),
+            'privateKey' => env('WEBPAY_PRIVATE_KEY', 'privateKey.crt'),
+            'publicCert' => env('WEBPAY_PUBLIC_CERT', 'publicCert.crt'),
             'webpayCert' => env('WEBPAY_CERT', null)
         ],
         'onepay' => [
-            'apiKey' => env('ONEPAY_API_KEY'),
-            'secret' => env('ONEPAY_SECRET'),
+            'apiKey' => env('ONEPAY_API_KEY', ''),
+            'secret' => env('ONEPAY_SECRET', ''),
         ]
     ],
 
