@@ -9,12 +9,12 @@ use DarkGhostHunter\TransbankApi\Transbank as TransbankAccessor;
  * Class Transbank
  * @package DarkGhostHunter\Transbanker\Facades
  *
- * @method isIntegration()
- * @method isProduction()
- * @method getEnvironment()
- * @method setEnvironment(string $environment)
- * @method getLogger()
- * @method setLogger(\Psr\Log\LoggerInterface $logger)
+ * @method static isIntegration()
+ * @method static isProduction()
+ * @method static getEnvironment()
+ * @method static setEnvironment(string $environment)
+ * @method static getLogger()
+ * @method static setLogger(\Psr\Log\LoggerInterface $logger)
  */
 class Transbank extends Facade
 {
