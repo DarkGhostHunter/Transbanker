@@ -5,7 +5,7 @@
     <title>Conectando con Webpay...</title>
 </head>
 <body>
-    <form id="redirect" action="{{ $response->url }}?>" method="POST">
+    <form id="redirect" action="{{ $response->url }}" method="POST">
         <input type="hidden" name="{{ $response->getTokenName() }}?>" value="{{ $response->token }}">
     </form>
     <script>
