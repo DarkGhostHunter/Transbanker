@@ -9,7 +9,14 @@ Sharon McCutcheon - Unsplash (UL) #-8a5eJ1-mmQ](https://images.unsplash.com/phot
 
 **Transbank API connector for Laravel**
 
-This package connects [Transbank API](https://github.com/DarkGhostHunter/TransbankApi/), a chilean payment gateway, to your Laravel Application.
+This package connects the [Transbank API](https://github.com/DarkGhostHunter/TransbankApi/) package, which allows you to use Transbank payment gateway, to your Laravel Application.
+
+## Requirements
+
+* PHP >= 7.1.3
+* Laravel 5.8
+
+> Check older releases for older Laravel versions.
 
 ## Installation
 
@@ -57,7 +64,7 @@ That is the basic configuration. If you need to fine tune this package, refer to
 
 ## Redirection
 
-This package registers the `transbank::webpay-redirect` for instant redirection to Webpay. When creating a Webpay Plus or Webpay Oneclick transaction, you can redirect the user instantly to the payment gateway in your controllers:
+This package registers the `transbank::webpay-redirect` for instant redirection to Webpay. When creating a Webpay Plus or Webpay Oneclick transaction, you can redirect the user instantly to the payment gateway inside your controllers:
 
 ```php
 <?
