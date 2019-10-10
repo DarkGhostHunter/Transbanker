@@ -27,9 +27,16 @@ class ServiceProvider extends BaseServiceProvider
             $transbank->setEnvironment(
                 $app->make('config')->get('transbank.environment')
             );
+            
+            // Only load the certificates if the application has a valid commerce code to
+            // make transactions. This is mandatory when the commerce must validate, so
+            // the commerce will be on "integration" env but with valid certificates.
+            if ($config->get('transbank.credentials.webpay.commerceCode')) {
+                $transbank->setCredentials('webpay', $this->mergeWebpayCredentials($app));
+            }
 
+            // Load the production credentials for Onepay only on production environments.
             if ($transbank->isProduction()) {
-                $transbank->setCredentials('webpay', $this->mergeWebpayCredentials());
                 $transbank->setCredentials('onepay', config('transbank.credentials.onepay'));
             }
 
