@@ -23,10 +23,10 @@ class ServiceProvider extends BaseServiceProvider
         // Register the Transbank Configuration
         $this->app->singleton(Transbank::class, function ($app) {
             $transbank = new Transbank($app->make('log'));
+            
+            $config = $app->make('config');
 
-            $transbank->setEnvironment(
-                $app->make('config')->get('transbank.environment')
-            );
+            $transbank->setEnvironment($config->get('transbank.environment'));
             
             // Only load the certificates if the application has a valid commerce code to
             // make transactions. This is mandatory when the commerce must validate, so
