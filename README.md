@@ -1,5 +1,4 @@
-![
-Sharon McCutcheon - Unsplash (UL) #-8a5eJ1-mmQ](https://images.unsplash.com/photo-1518458028785-8fbcd101ebb9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1280&h=400&q=80)
+![Sharon McCutcheon - Unsplash (UL) #-8a5eJ1-mmQ](https://images.unsplash.com/photo-1518458028785-8fbcd101ebb9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1280&h=400&q=80)
 
 [![Latest Stable Version](https://poser.pugx.org/darkghosthunter/transbanker/v/stable)](https://packagist.org/packages/darkghosthunter/transbanker) [![License](https://poser.pugx.org/darkghosthunter/transbanker/license)](https://packagist.org/packages/darkghosthunter/transbanker)
 ![](https://img.shields.io/packagist/php-v/darkghosthunter/transbanker.svg)
@@ -13,8 +12,8 @@ This package connects the [Transbank API](https://github.com/DarkGhostHunter/Tra
 
 ## Requirements
 
-* PHP >= 7.1.3
-* Laravel 5.8
+* PHP >= 7.2.15
+* Laravel 6.x or 7.x
 
 > Check older releases for older Laravel versions.
 

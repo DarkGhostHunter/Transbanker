@@ -2,6 +2,7 @@
 
 namespace DarkGhostHunter\Transbanker;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use DarkGhostHunter\TransbankApi\Onepay;
 use DarkGhostHunter\TransbankApi\Webpay;
@@ -59,8 +60,8 @@ class ServiceProvider extends BaseServiceProvider
         $array = array_filter($array);
 
         return array_merge($array, [
-            'privateKey' => $this->getWebpayCredential(array_get($array, 'privateKey')),
-            'publicCert' => $this->getWebpayCredential(array_get($array, 'publicCert')),
+            'privateKey' => $this->getWebpayCredential(Arr::get($array, 'privateKey')),
+            'publicCert' => $this->getWebpayCredential(Arr::get($array, 'publicCert')),
         ]);
     }
 
