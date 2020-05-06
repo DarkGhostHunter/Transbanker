@@ -9,6 +9,14 @@
         "laravel"
     ],
     "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Italo Israel Baeza Cabrera",
+            "email": "darkghosthunter@gmail.com",
+            "role": "Developer"
+        }
+    ],
     "require": {
         "php": "^7.2.5",
         "illuminate/http": "^6.0||^7.0",
@@ -22,6 +30,25 @@
         "phpunit/phpunit": "^8.5",
         "orchestra/testbench": "^4.8||^5.2"
     },
+    "autoload": {
+        "psr-4": {
+            "DarkGhostHunter\\Transbanker\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+
+    },
+    "config": {
+        "sort-packages": true,
+        "process-timeout": 900
+    },
     "extra": {
         "laravel": {
             "providers": [
@@ -32,16 +59,6 @@
                 "Webpay": "DarkGhostHunter\\Transbanker\\Facades\\Webpay",
                 "Onepay": "DarkGhostHunter\\Transbanker\\Facades\\Onepay"
             }
-        }
-    },
-    "autoload": {
-        "psr-4": {
-            "DarkGhostHunter\\Transbanker\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Tests\\": "tests/"
         }
     }
 }
