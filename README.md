@@ -41,7 +41,7 @@ The `integration` environment sets testing credentials automatically, so you don
 
 Otherwise, in `production` environment, you will need to add your Transbank credentials for your services. 
 
-For Webpay, **these must be located under `storage/app/transbank/webpay` as files**. You can overload the default `webpay.cert` that comes with this package with your own.
+For Webpay, **these must be located under `storage/transbank/webpay` as files**. You can overload the default `webpay.cert` that comes with this package with your own.
 
 ```dotenv
 WEBPAY_COMMERCE_CODE=5000000001
