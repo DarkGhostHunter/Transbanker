@@ -12,8 +12,8 @@ This package connects the [Transbank API](https://github.com/DarkGhostHunter/Tra
 
 ## Requirements
 
-* PHP >= 7.2.15
-* Laravel 6.x or 7.x
+* PHP >= 7.3
+* Laravel 6.x, 7.x or 8.x
 
 > Check older releases for older Laravel versions.
 
