@@ -24,7 +24,7 @@
         "illuminate/config": "^6.0||^7.0||^8.0",
         "illuminate/support": "^6.0||^7.0||^8.0",
         "illuminate/view": "^6.0||^7.0||^8.0",
-        "darkghosthunter/transbank-api": "^2.0"
+        "darkghosthunter/transbank-api": "^2.0 || ^3.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.0",
