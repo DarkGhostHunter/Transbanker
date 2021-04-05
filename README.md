@@ -1,4 +1,4 @@
-# Use [https://github.com/DarkGhostHunter/Larabanker]
+# Use [Larabanker](https://github.com/DarkGhostHunter/Larabanker)
 
 This package has been deprecated for a new version, which uses a REST and HTTP Client.
 
