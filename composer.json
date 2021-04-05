@@ -1,11 +1,10 @@
 {
-    "name": "darkghosthunter/transbanker",
-    "description": "Transbank API connector for Laravel",
+    "name": "darkghosthunter/larabanker",
+    "description": "Transbank SDK for Laravel",
     "keywords": [
         "transbank",
         "webpay",
-        "onepay",
-        "patpass",
+        "oneclick",
         "laravel"
     ],
     "license": "MIT",
@@ -18,22 +17,24 @@
         }
     ],
     "require": {
-        "php": "^7.3||^7.4||^8.0",
-        "illuminate/http": "^6.0||^7.0||^8.0",
-        "illuminate/events": "^6.0||^7.0||^8.0",
-        "illuminate/config": "^6.0||^7.0||^8.0",
-        "illuminate/support": "^6.0||^7.0||^8.0",
-        "illuminate/view": "^6.0||^7.0||^8.0",
-        "darkghosthunter/transbank-api": "^2.0"
+        "php": ">=7.3",
+        "ext-json": "*",
+        "illuminate/http": "^7.0||^8.0",
+        "illuminate/events": "^7.0||^8.0",
+        "illuminate/config": "^7.0||^8.0",
+        "illuminate/support": "^7.0||^8.0",
+        "illuminate/view": "^7.0||^8.0",
+        "guzzlehttp/guzzle": "^7.2",
+        "darkghosthunter/transbank": "^1.0.1"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.0",
+        "phpunit/phpunit": "^9.5",
         "mockery/mockery": "^1.4",
-        "orchestra/testbench": "^4.8||^5.2||^6.0"
+        "orchestra/testbench": "^5.2||^6.0"
     },
     "autoload": {
         "psr-4": {
-            "DarkGhostHunter\\Transbanker\\": "src/"
+            "DarkGhostHunter\\Larabanker\\": "src/"
         }
     },
     "autoload-dev": {
@@ -53,12 +54,13 @@
     "extra": {
         "laravel": {
             "providers": [
-                "DarkGhostHunter\\Transbanker\\ServiceProvider"
+                "DarkGhostHunter\\Larabanker\\ServiceProvider"
             ],
             "aliases": {
-                "Transbank": "DarkGhostHunter\\Transbanker\\Facades\\Transbank",
-                "Webpay": "DarkGhostHunter\\Transbanker\\Facades\\Webpay",
-                "Onepay": "DarkGhostHunter\\Transbanker\\Facades\\Onepay"
+                "Transbank": "DarkGhostHunter\\Larabanker\\Facades\\Transbank",
+                "Webpay": "DarkGhostHunter\\Larabanker\\Facades\\Webpay",
+                "WebpayMall": "DarkGhostHunter\\Larabanker\\Facades\\WebpayMall",
+                "OneclickMall": "DarkGhostHunter\\Larabanker\\Facades\\OneclickMall"
             }
         }
     }

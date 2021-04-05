@@ -2,18 +2,16 @@
 
 [![Latest Stable Version](https://poser.pugx.org/darkghosthunter/transbanker/v/stable)](https://packagist.org/packages/darkghosthunter/transbanker) [![License](https://poser.pugx.org/darkghosthunter/transbanker/license)](https://packagist.org/packages/darkghosthunter/transbanker)
 ![](https://img.shields.io/packagist/php-v/darkghosthunter/transbanker.svg)
-[![Build Status](https://travis-ci.com/DarkGhostHunter/Transbanker.svg?branch=master)](https://travis-ci.com/DarkGhostHunter/Transbanker) [![Coverage Status](https://coveralls.io/repos/github/DarkGhostHunter/Transbanker/badge.svg?branch=master)](https://coveralls.io/github/DarkGhostHunter/Transbanker?branch=master) [![Maintainability](https://api.codeclimate.com/v1/badges/20d69b045d3c273d2e4d/maintainability)](https://codeclimate.com/github/DarkGhostHunter/Transbanker/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/20d69b045d3c273d2e4d/test_coverage)](https://codeclimate.com/github/DarkGhostHunter/Transbanker/test_coverage)
+[![Build Status](https://travis-ci.com/DarkGhostHunter/Transbanker.svg?branch=master)](https://travis-ci.com/DarkGhostHunter/Transbanker) [![Coverage Status](https://coveralls.io/repos/github/DarkGhostHunter/Transbanker/badge.svg?branch=master)](https://coveralls.io/github/DarkGhostHunter/Transbanker?branch=master) [![Maintainability](https://api.codeclimate.com/v1/badges/20d69b045d3c273d2e4d/maintainability)](https://codeclimate.com/github/DarkGhostHunter/Transbanker/maintainability)
 
-# Laravel Transbanker
+# Larabanker - Transbank for Laravel
 
-**Transbank API connector for Laravel**
-
-This package connects the [Transbank API](https://github.com/DarkGhostHunter/TransbankApi/) package, which allows you to use Transbank payment gateway, to your Laravel Application.
+This package connects the [Transbank Webpay services](https://github.com/DarkGhostHunter/Transbank/) package, which allows you to use Transbank Webpay payment gateway into your Laravel Application.
 
 ## Requirements
 
 * PHP >= 7.3
-* Laravel 6.x, 7.x or 8.x
+* Laravel 7.x or 8.x
 
 > Check older releases for older Laravel versions.
 
@@ -22,113 +20,225 @@ This package connects the [Transbank API](https://github.com/DarkGhostHunter/Tra
 Call composer and require it into your application.
 
 ```bash
-composer require darkghosthunter/transbanker
+composer require darkghosthunter/larabanker
 ``` 
+
+## Documentation
+
+This package mimics the Transbank SDK, so you should check the documentation of these services in Transbank Developer's site (in spanish).
+
+- [Webpay](https://www.transbankdevelopers.cl/documentacion/webpay-plus#webpay-plus) - [[English translated]](https://translate.google.com/translate?hl=&sl=es&tl=en&u=https%3A%2F%2Fwww.transbankdevelopers.cl%2Fdocumentacion%2Fwebpay-plus)
+- [Webpay Mall](https://www.transbankdevelopers.cl/documentacion/webpay-plus#webpay-plus-mall) - [[English translated]](https://translate.google.com/translate?hl=&sl=es&tl=en&u=https%3A%2F%2Fwww.transbankdevelopers.cl%2Fdocumentacion%2Fwebpay-plus%23webpay-plus-mall)
+- [Oneclick Mall](https://www.transbankdevelopers.cl/documentacion/oneclick) - [[English translated]](https://translate.google.com/translate?hl=&sl=es&tl=en&u=https%3A%2F%2Fwww.transbankdevelopers.cl%2Fdocumentacion%2Foneclick)
+
+## Quickstart
+
+To start playing with Transbank services, you can use the included `Webpay`, `WebpayMall` and `Oneclick` facades which use minimum parameters.
+
+Along the facades, you can also use the `larabanker::webpay.redirect` or `larabanker::oneclick.redirect` views to redirect the user to Transbank and complete the Webpay payment or Oneclick registration, respectively.
+
+```php
+use DarkGhostHunter\Larabanker\Facades\Webpay;
+
+$response = Webpay::create('buy-order#1230', 1000);
+
+return view('larabanker::webpay.redirect')->with('response', $response);
+```
+
+The redirection URLs, which Transbank uses to redirect the user back to your application once the payment process is complete, are these by default. 
+
+| Service | URL | Value |
+|---|---|---|
+| Webpay        | Return URL        | `http://yourappurl.com/transbank/webpay`
+| Webpay Mall   | Return URL        | `http://yourappurl.com/transbank/webpayMall`
+| Oneclick Mall | Response URL      | `http://yourappurl.com/transbank/oneclickMall`
+
+You're free to [change these URLs with the config file](#redirection). Be sure to add your controllers for these routes to process the incoming response.
+
+```php
+<?php
+
+use \Illuminate\Support\Facades\Route;
+use \App\Http\Controllers\WebpayController;
+
+Route::post('/transbank/webpay', [WebpayController::class, 'receivePayment']);
+```
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use DarkGhostHunter\Larabanker\Facades\Webpay;
+
+class WebpayController extends Controller
+{
+    /**
+     * Process the payment. 
+     * 
+     * @param  \App\Http\Controllers\Request $request
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function receivePayment(Request $request)
+    {
+        $transaction = Webpay::commit($request->input('token_ws'));
+        
+        return view('payment.processed')->with('transaction', $transaction);
+    }
+}
+```
+
+In any case, be sure to add your logic in these routes to receive Transbank http POST Requests, and **remove the `csrf` middleware** since Transbank will need to hit these routes to complete the transaction.
+
+```php
+<?php 
+
+namespace App\Http\Middleware;
+
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as BaseVerifier;
+
+class VerifyCsrfToken extends BaseVerifier
+{
+    /**
+     * The URIs that should be excluded from CSRF verification.
+     *
+     * @var array
+     */
+    protected $except = [
+        'transbank/*', // If you're using the default routes.
+    ];
+}
+```
 
 ## Configuration
 
-### Environment
+While Larabanker is made to use conveniently without setting too much, you can go deeper by publishing the configuration file:
 
-By default, the package uses `integration` unless you explicitly set `production`, which will make all transactions real.
+    php artisan vendor:publish --provider="DarkGhostHunter\Larabanker\ServiceProvider"
+
+You will receive the `larabanker.php` config file with the following contents:
+
+```php
+<?php
+
+return [
+    'environment' => env('TRANSBANK_ENV', 'integration'),
+    'credentials' => [
+        // ...
+    ],
+    'redirects_base' => env('APP_URL'),
+    'redirects' => [
+        'webpay'       => '/transbank/webpay',
+        'webpayMall'   => '/transbank/webpayMall',
+        'oneclickMall' => '/transbank/oneclickMall',
+    ],
+    'protect' => env('TRANSBANK_PROTECT', false),
+    'cache' => null,
+    'cache_prefix' => env('TRANSBANK_PROTECT_PREFIX', 'transbank|token')
+];
+```
+
+Don't worry, we will explain each important part one by one.
+
+### Environment & Credentials
+
+```php
+<?php
+
+return [
+    'environment' => env('TRANSBANK_ENV', 'integration'),
+    'credentials' => [
+        'webpay' => [
+            'key' => env('WEBPAY_KEY'),
+            'secret' => env('WEBPAY_SECRET'),
+        ],
+        'webpayMall' => [
+            'key' => env('WEBPAY_MALL_KEY'),
+            'secret' => env('WEBPAY_MALL_SECRET'),
+        ],
+        'oneclickMall' => [
+            'key' => env('ONECLICK_MALL_KEY'),
+            'secret' => env('ONECLICK_MALL_SECRET'),
+        ],
+    ],
+];
+```
+
+By default, the package uses the `integration` environment, which makes fake transactions.
+
+To use the `production` environment, which will make all transactions real, set the environment as `production` **explicitly**:
 
 ```dotenv
 TRANSBANK_ENV=production
 ```
 
-### Credentials
-
-The `integration` environment sets testing credentials automatically, so you don't need to set them unless you want to overwrite one of them. 
-
-Otherwise, in `production` environment, you will need to add your Transbank credentials for your services. 
-
-For Webpay, **these must be located under `storage/transbank/webpay` as files**. You can overload the default `webpay.cert` that comes with this package with your own.
+Additionally, you must add your Transbank credentials for your services, which will be issued directly to you, for the service(s) you have contracted. You can do it easily in your `.env` file.
 
 ```dotenv
-WEBPAY_COMMERCE_CODE=5000000001
-WEBPAY_PRIVATE_KEY=private.key
-WEBPAY_PUBLIC_CERT=public.cert
-WEBPAY_CERT=webpay.cert
+WEBPAY_KEY=5000000001
+WEBPAY_SECRET=dKVhq1WGt_XapIYirTXNyUKoWTDFfxaEV63-O5jcsdw
 ```
 
-For Onepay, you can use the API key and Secret directly.
-
-```dotenv
-ONEPAY_API_KEY=dKVhq1WGt_XapIYirTXNyUKoWTDFfxaEV63-O5jcsdw
-ONEPAY_SECRET="?XW#WOLG##FBAGEAYSNQ5APD#JF@$AYZ"
-```
-
-> If your secret has `#` characters, you may want to enclose it using double quotes `"`.
-
-That is the basic configuration. If you need to fine tune this package, refer to the Advanced section.
-
-## Redirection
-
-This package registers the `transbank::webpay-redirect` for instant redirection to Webpay. When creating a Webpay Plus or Webpay Oneclick transaction, you can redirect the user instantly to the payment gateway inside your controllers:
+### Redirection
 
 ```php
-<?
+<?php
 
-namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
-use DarkGhostHunter\Transbanker\Facades\Webpay;
-
-class PaymentController extends Controller {
-    
-    /**
-     * Creates a Payment
-     * 
-     * @param Request $request
-     * @return \Illuminate\View\View
-     */
-    public function pay(Request $request)
-    {
-        // .. Validate Request, amount, etc..
-        
-        $response = Webpay::createNormal([
-            'sessionId' => $request->session()->getId(),
-            'buyOrder'  => 'myOrder#16548',
-            'amount'    => 1000,
-        ]);
-        
-        return view('transbanker::webpay-redirect', [
-            'response' => $response            
-        ]);
-    }
-    
-}
-```  
-
-## Usage
-
-For usage, check the [TransbankApi](https://github.com/DarkGhostHunter/transbank-api/wiki/) (Spanish, [English by Google Translate](https://translate.google.com/translate?hl=en&sl=es&tl=en&u=https%3A%2F%2Fgithub.com%2FDarkGhostHunter%2Ftransbank-api%2Fwiki%2F)). 
-
-## Advanced
-
-To fine tune Transbanker, just publish the config file:
-
-```bash
-php artisan vendor:publish --provider="DarkGhostHunter\Transbanker\TransbankerServiceProvider"
+return [
+    'redirects_base' => env('APP_URL'),
+    'redirects' => [
+        'webpay'       => '/transbank/webpay',
+        'webpayMall'   => '/transbank/webpayMall',
+        'oneclickMall' => '/transbank/oneclickMall',
+    ],
+];
 ```
 
-This will publish the `transbank.php` file in the `config` directory.
+Only using the `Webpay`, `WebpayMall` and `OneclickMall` facades, you will be able to skip issuing the `$returnUrl` or `$responseUrl` values to the transaction creation, letting Larabanker to use the defaults issued in your config file.
 
-### Routes
+```php
+use DarkGhostHunter\Larabanker\Facades\Webpay;
 
-This package with some default routes for your application (as configured inside `config/transbank.php`):
+$response = Webpay::create('myOrder#16548', 1000);
+```
 
-| Service | URL | Value |
-|---|---|---|
-| Webpay Plus | Return URL | `http://yourappurl.com/webpay/result` |
-| Webpay Plus | Final URL | `http://yourappurl.com/webpay/receipt` |
-| Webpay Plus | Mall Return URL | `http://yourappurl.com/webpay/mall/result` |
-| Webpay Plus | Mall Final URL | `http://yourappurl.com/webpay/mall/receipt` |
-| Webpay Oneclick | Response URL | `http://yourappurl.com/webpay/registration` |
-| Onepay | Callback URL  | `http://yourappurl.com/onepay/result` |
+Additionally, it will also push the Session ID to the transaction, so you can retrieve it and continue the session in another device if you want. If the Session has not started, or is unavailable like on stateless routes, a throwaway random Session ID will be generated.
 
-You're free to change these URLs.
+> If you need control over the parameters, you can use the `Transbank` Facade directly and call the service method.
+> 
+> ```php
+> use DarkGhostHunter\Larabanker\Facades\Transbank;
+> 
+> $response = Transbank::webpay()->create('myOrder#16548', 1000, 'https://app.com/return', 'my-sessionId');
+> ```
 
-In any case, be sure to add your logic in these routes to receive Transbank http POST Requests, and **remove the `csrf` middleware** since Webpay will need to hit these routes so the payment can be processed.
+### Endpoint Protection
+
+```php
+<?php
+
+return [
+    'protect' => env('TRANSBANK_PROTECT', false),
+    'cache' => null,
+    'cache_prefix' => env('TRANSBANK_PROTECT_PREFIX', 'transbank|token')
+];
+```
+
+Disabled by default, this package offers a brute-force attack protection middleware, `larabank.protect`, for return URL. These return URLs are your application endpoints that Transbank services will redirect the user to, using a `POST` request.
+
+It works transparently, so there if it's disabled, the middleware won't verify the token. 
+
+```php
+use \Illuminate\Support\Facades\Route;
+use \App\Http\Controllers\WebpayController;
+
+Route::post('/transbank/webpay', [WebpayController::class, 'receivePayment'])
+     ->middleware('larabank.protect');
+```
+
+It uses the cache to save the transaction token for 5 minutes, so if the token is not valid, the whole response is aborted. You can change the cache store and prefix with `cache` and `cache_prefix`, respectively.
+
+> This works for receiving the redirection from Transbank on Webpay, Webpay Mall and Oneclick Mall services.
 
 ## License
 

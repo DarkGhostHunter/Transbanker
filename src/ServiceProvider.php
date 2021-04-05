@@ -1,12 +1,24 @@
 <?php
 
-namespace DarkGhostHunter\Transbanker;
+namespace DarkGhostHunter\Larabanker;
 
-use Illuminate\Support\Arr;
+use DarkGhostHunter\Larabanker\Http\Middleware\EndpointProtect;
+use DarkGhostHunter\Larabanker\Listeners\SaveTransactionToken;
+use DarkGhostHunter\Transbank\Credentials\Container;
+use DarkGhostHunter\Transbank\Events\TransactionCreated;
+use DarkGhostHunter\Transbank\Http\Connector;
+use DarkGhostHunter\Transbank\Services\OneclickMall;
+use DarkGhostHunter\Transbank\Services\Webpay;
+use DarkGhostHunter\Transbank\Services\WebpayMall;
+use DarkGhostHunter\Transbank\Transbank;
+use GuzzleHttp\Client;
+use Illuminate\Config\Repository;
+use Illuminate\Contracts\Cache\Factory;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
-use DarkGhostHunter\TransbankApi\Onepay;
-use DarkGhostHunter\TransbankApi\Webpay;
-use DarkGhostHunter\TransbankApi\Transbank;
+use Nyholm\Psr7\Factory\Psr17Factory;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -18,83 +30,66 @@ class ServiceProvider extends BaseServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/transbanker.php', 'transbank'
+            __DIR__ . '/../config/larabanker.php', 'larabanker'
         );
 
-        // Register the Transbank Configuration
-        $this->app->singleton(Transbank::class, function ($app) {
-            $transbank = new Transbank($app->make('log'));
-            
-            $config = $app->make('config');
+        $this->app->singleton(Transbank::class, static function(Application $app) : Transbank {
+            $transbank = new Transbank(
+                new Container(),
+                $app->make('log'),
+                new EventDispatcher($app->make('events')),
+                new Connector($app->make(Client::class), $factory = new Psr17Factory(), $factory)
+            );
 
-            $transbank->setEnvironment($config->get('transbank.environment'));
-            
-            // Only load the certificates if the application has a valid commerce code to
-            // make transactions. This is mandatory when the commerce must validate, so
-            // the commerce will be on "integration" env but with valid certificates.
-            if ($config->get('transbank.credentials.webpay.commerceCode')) {
-                $transbank->setCredentials('webpay', $this->mergeWebpayCredentials($app));
-            }
+            $config = $app->make(Repository::class);
 
-            // Load the production credentials for Onepay only on production environments.
-            if ($transbank->isProduction()) {
-                $transbank->setCredentials('onepay', config('transbank.credentials.onepay'));
+            if ($config->get('larabanker.enable') ?? $app->environment('production')) {
+                $transbank->toProduction($config->get('larabanker.credentials'));
             }
 
             return $transbank;
         });
 
-        // Register the Webpay Service
-        $this->app->singleton(Webpay::class, function ($app) {
+        $this->app->singleton(Webpay::class, static function (Application $app) {
             return $app->make(Transbank::class)->webpay();
         });
 
-        // Register the Onepay Service
-        $this->app->singleton(Onepay::class, function ($app) {
-            return $app->make(Transbank::class)->onepay();
+        $this->app->singleton(WebpayMall::class, static function (Application $app) {
+            return $app->make(Transbank::class)->webpayMall();
         });
-    }
 
-    /**
-     * Merges the Webpay Config with the readable file credentials
-     *
-     * @return array
-     */
-    protected function mergeWebpayCredentials()
-    {
-        $array = config('transbank.credentials.webpay');
+        $this->app->singleton(OneclickMall::class, static function (Application $app) {
+            return $app->make(Transbank::class)->oneclickMall();
+        });
 
-        $array = array_filter($array);
-
-        return array_merge($array, [
-            'privateKey' => $this->getWebpayCredential(Arr::get($array, 'privateKey')),
-            'publicCert' => $this->getWebpayCredential(Arr::get($array, 'publicCert')),
-        ]);
-    }
-
-    /**
-     * Reads the credentials file contents
-     *
-     * @param string $file
-     * @return bool|string
-     */
-    protected function getWebpayCredential(string $file = null)
-    {
-        return file_get_contents(storage_path('transbank/webpay/' . $file));
+        $this->app->singleton(EndpointProtect::class, static function(Application $app) : EndpointProtect {
+            return new EndpointProtect($app->make(Repository::class));
+        });
     }
 
     /**
      * Bootstrap any application services.
      *
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
+     * @param  \Illuminate\Routing\Router  $router
+     * @param  \Illuminate\Config\Repository  $config
+     *
      * @return void
      */
-    public function boot()
+    public function boot(Dispatcher $dispatcher, Router $router, Repository $config)
     {
-        $this->publishes([
-            __DIR__ . '/../config/transbanker.php' => config_path('transbanker.php'),
-        ]);
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'larabanker');
+        $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'larabanker');
+        $router->aliasMiddleware('larabanker.protect', EndpointProtect::class);
 
-        $this->loadViewsFrom(__DIR__.'/../resources/views', 'transbanker');
+        if ($config->get('larabanker.protect')) {
+            $dispatcher->listen(TransactionCreated::class, SaveTransactionToken::class);
+        }
+
+        if ($this->app->runningInConsole()) {
+            $this->publishes([__DIR__ . '/../config/larabanker.php' => config_path('larabanker.php')], 'config');
+            $this->publishes([__DIR__.'/../resources/views' => resource_path('views/vendor/larabanker')], 'views');
+            $this->publishes([__DIR__.'/../resources/lang' => resource_path('lang/vendor/larabanker')], 'lang');
+        }
     }
-
 }

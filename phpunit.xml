@@ -12,7 +12,7 @@
 >
     <testsuites>
         <testsuite name="Larapoke Test Suite">
-            <directory suffix="Test.php">tests/Unit</directory>
+            <directory suffix="Test.php">tests</directory>
         </testsuite>
     </testsuites>
     <filter>
@@ -21,6 +21,7 @@
         </whitelist>
     </filter>
     <php>
+        <env name="APP_URL" value="http://myapp.com/"/>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_KEY" value="AckfSECXIvnK5r28GVIWUAxmbBSjTsmF"/>
     </php>
